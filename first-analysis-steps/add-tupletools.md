@@ -6,7 +6,7 @@
 * Use branches
 * Find useful TupleTools
 * Learn how to use LoKi functors in a DecayTreeTuple
-{% endobjectives %} 
+{% endobjectives %}
 
 Usually, the default information stored by `DecayTreeTuple` as shown in our [minimal DaVinci job](minimal-dv-job.html) is not enough for physics analysis.
 Fortunately, most of the information we need can be added by adding C++ tools (known as `TupleTools`) to `dtt`;
@@ -20,7 +20,7 @@ The default tools added in `DecayTreeTuple` are:
  - `TupleToolANNPID`, which stores the new NeuralNet-based PID information of the particle.
  - `TupleToolGeometry`, which stores the geometrical variables (IP, vertex position, etc) of the particle.
  - `TupleToolEventInfo`, which stores general information (event number, run number, GPS time, etc) of the event.
-{% endcallout %} 
+{% endcallout %}
 
 In order to add `TupleTools` to `dtt`, we have to use the `addTupleTool` method of `DecayTreeTuple` (only available when we have `from DecayTreeTuple.Configuration import *` in our script).
 This method instantiates the tool, adds it to the list of tools to execute and returns it.
@@ -82,7 +82,7 @@ dtt.D0.addTupleTool('TupleToolPropertime')
 ```
 
 {% callout "Do I really have to type my decay descriptor that many times?" %}
-No! You can use the (new) `dtt.setDescriptorTemplate()` method to set up your 
+No! You can use the (new) `dtt.setDescriptorTemplate()` method to set up your
 decay descriptor and branches in just one line!
 Well, nearly: because this is a new feature it is not available in most released versions of `DaVinci`, but [this snippet](https://gitlab.cern.ch/snippets/147) will add it to an older version.
 With that out of the way, you can simply use
@@ -90,12 +90,12 @@ With that out of the way, you can simply use
 dtt.setDescriptorTemplate('${Dstar}[D*(2010)+ -> ${D0}(D0 -> ${Kminus}K- ${Kplus}K+) ${pisoft}pi+]CC')
 ```
 This will set up both `dtt.Decay` and `Branches` for you.
-{% endcallout %} 
+{% endcallout %}
 
 The usage of `Branches` is very important (and strongly encouraged) to keep the size of your ntuples small, since it prevents us from storing unneeded information (for example trigger information, which will be discussed at a later lesson).
 
 {% callout "Where to find TupleTools" %}
-One of the most difficult things is to know which tool we need to add to our 
+One of the most difficult things is to know which tool we need to add to our
 `DecayTreeTuple` in order to get the information we want.
 For this, it is necessary to know where to find `TupleTools` and their code.
 `TupleTools` are spread in 9 packages under `Analysis/Phys` (see the master branch in `git` [here](https://gitlab.cern.ch/lhcb/Analysis/tree/master/Phys)), all starting with the prefix `DecayTreeTuple`, according to the type of information they fill in our ntuple:
@@ -117,12 +117,12 @@ As an example, to get the information on the `TupleToolTrackInfo` we used before
  In case we need more information or need to know *exactly* what the code does, the `fill` method is the one we need to look at.
 
  As a shortcut, the list of tupletools can also be found in doxygen at the top of the pages for the [`IParticleTupleTool`](http://lhcb-doxygen.web.cern.ch/lhcb-doxygen/davinci/latest/de/df8/struct_i_particle_tuple_tool.html) and the [`IEventTupleTool`](http://lhcb-doxygen.web.cern.ch/lhcb-doxygen/davinci/latest/d5/d88/struct_i_event_tuple_tool.html) interfaces (depending on whether they fill information about specific particles or the event in general).
-{% endcallout %} 
+{% endcallout %}
 
 The updated options can be found [here](./code/add-tupletools/ntuple_options.py).
 
 {% challenge "Test your ntuple" %}
-Run the options in the same way as in the [minimal DaVinci 
+Run the options in the same way as in the [minimal DaVinci
 job](minimal-dv-job.html) lesson.
 You will obtain a `DVntuple.root` file, which we can open and inspect with `ROOT`'s `TBrowser`:
 
@@ -135,23 +135,23 @@ root [2]
 ```
 
 Try to locate the branches we have added, which are placed in the `TupleDstToD0pi_D0ToKpi/DecayTree`, and plot some distributions by double-clicking the leaves.
-{% endchallenge %} 
+{% endchallenge %}
 
 Picking up with the [LoKi functors lesson](loki-functors.html), let's store some specific bits of information discussed there in our ntuple.
 To add LoKi-based leaves to the tree, we need to use the `LoKi::Hybrid::TupleTool`, which is configured with 3 arguments:
 
-  1. Its *name*, specified in the `addTupleTool` call after a `/`.  This is 
-     very useful (and recommended) if we want to have different 
-     `LoKi::Hybrid::TupleTool` for each of our branches. For instance, we may 
+  1. Its *name*, specified in the `addTupleTool` call after a `/`.  This is
+     very useful (and recommended) if we want to have different
+     `LoKi::Hybrid::TupleTool` for each of our branches. For instance, we may
      want to add different information for the D*, the D0 and the soft $$\pi$$:
     ```python
     dstar_hybrid = dtt.Dstar.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_Dstar')
     d0_hybrid = dtt.D0.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_D0')
     pisoft_hybrid = dtt.pisoft.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_PiSoft')
     ```
-  2. The `Preambulo` property, which lets us perform preprocessing of the LoKi 
-     functors to simplify the code that is used to fill the leaves, for example 
-     creating combinations of LoKi functors or performing mathematical 
+  2. The `Preambulo` property, which lets us perform preprocessing of the LoKi
+     functors to simplify the code that is used to fill the leaves, for example
+     creating combinations of LoKi functors or performing mathematical
      operations:
     ```python
     preamble = [
@@ -161,8 +161,8 @@ To add LoKi-based leaves to the tree, we need to use the `LoKi::Hybrid::TupleToo
     dstar_hybrid.Preambulo = preamble
     d0_hybrid.Preambulo = preamble
     ```
-  3. The `Variables` property, consisting of a `dict` of (variable name, LoKi 
-     functor) pairs. In here, LoKi functors can be used, as well as any 
+  3. The `Variables` property, consisting of a `dict` of (variable name, LoKi
+     functor) pairs. In here, LoKi functors can be used, as well as any
      variable we may have defined in the `Preambulo`:
     ```python
     dstar_hybrid.Variables = {
@@ -192,8 +192,10 @@ To add LoKi-based leaves to the tree, we need to use the `LoKi::Hybrid::TupleToo
 In the code snippets specified above (available [here](code/add-tupletools/ntuple_options_loki.py)), you can see that the `NINTREE` functor counts the number of particles that pass the specified criteria. While this is not very useful for ntuple-building (we can always do it offline), it's a very powerful functor to use when building decay selections.
 
 {% challenge "Getting more practice" %}
-In the `LoKi::Hybrid::TupleTool`we've used some  functors that have not been 
-described previously. Find out what they do in the 
+In the `LoKi::Hybrid::TupleTool`we've used some  functors that have not been
+described previously. Find out what they do in the
 [doxygen](http://lhcb-doxygen.web.cern.ch/lhcb-doxygen/davinci/latest/d7/dae/namespace_lo_ki_1_1_cuts.html).
 To check `SUMTREE` and `CHILD`, run the code above and check that the `Dstar_max_pt` and `Dstar_max_pt_preambulo` and the `Dstar_mass_D0` and `D0_mass` branches have exactly the same values.
-{% endchallenge %} 
+{% endchallenge %}
+
+The next step that would be very beneficial would be to actually learn how we can create our own TupleTool and then how to include such tool to DaVinci.
